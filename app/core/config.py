@@ -5,7 +5,7 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     APP_TITLE: str = "QRKot Charity Fund"
-    DATABASE_URL: str = "sqlite+aiosqlite:///./charityfund.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./fastapi.db"
     SECRET: str = "supersecretkey"
     FIRST_SUPERUSER_EMAIL: str = "admin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "changeme"
