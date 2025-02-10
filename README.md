@@ -39,8 +39,8 @@ QRKot — это платформа для сбора пожертвований
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/your-repository/qrcot-charity-fund.git
-cd qrcot-charity-fund
+git clone https://github.com/icek888/QRkot_spreadsheets
+cd QRkot_spreadsheets
 ```
 
 ### 2. Создание виртуального окружения
