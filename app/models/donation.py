@@ -5,7 +5,7 @@ from app.models.base import InvestmentBase
 
 class Donation(InvestmentBase):
     """Модель Пожертвования."""
-    __tablename__ = "donation"
+    __tablename__ = 'donation'
 
     user_id = Column(
         Integer,
@@ -15,6 +15,6 @@ class Donation(InvestmentBase):
 
     def __repr__(self) -> str:
         return (
-            f"user_id={self.user_id}, comment={self.comment}, "
-            f"{super().__repr__()}"
+            f'user_id={self.user_id}, comment={self.comment}, '
+            f'{super().__repr__()}'
         )

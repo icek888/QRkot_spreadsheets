@@ -1,3 +1,6 @@
+
+---
+
 # QRKot Charity Fund
 
 QRKot — это платформа для сбора пожертвований на благотворительные проекты. Пользователи могут делать пожертвования, а администраторы управлять проектами.
@@ -12,6 +15,8 @@ QRKot — это платформа для сбора пожертвований
 - **Авторизация пользователей**
   - Роли: пользователь / суперпользователь
 - **Просмотр собранных сумм**
+- **Создание отчетов в Google Sheets**  
+  Автоматическая генерация таблиц с отчетами по закрытым проектам, обновление данных и управление доступом через Google API.
 
 ---
 
@@ -24,6 +29,8 @@ QRKot — это платформа для сбора пожертвований
 - **FastAPI Users** (Аутентификация)
 - **SQLite** (База данных по умолчанию)
 - **Pytest** (Тестирование)
+- **Google API**  
+  Использование Google Sheets API (v4) и Google Drive API (v3) для создания и управления отчетными таблицами.
 
 ---
 
@@ -87,6 +94,18 @@ DATABASE_URL=sqlite+aiosqlite:///./example.db
 SECRET=your-secret-key
 FIRST_SUPERUSER_EMAIL=admin@example.com
 FIRST_SUPERUSER_PASSWORD=changeme
+
+# Переменные для Google API (необходимы для работы с Google Sheets и Drive)
+TYPE=your-google-type
+PROJECT_ID=your-google-project-id
+PRIVATE_KEY_ID=your-google-private-key-id
+PRIVATE_KEY=your-google-private-key
+CLIENT_EMAIL=your-google-client-email
+CLIENT_ID=your-google-client-id
+AUTH_URI=your-google-auth-uri
+TOKEN_URI=your-google-token-uri
+AUTH_PROVIDER_X509_CERT_URL=your-google-auth-provider-x509-cert-url
+CLIENT_X509_CERT_URL=your-google-client-x509-cert-url
 ```
 
 ---
@@ -110,6 +129,26 @@ FIRST_SUPERUSER_PASSWORD=changeme
 - **Сделать пожертвование**: `POST /donation/`
 - **Получить мои пожертвования**: `GET /donation/my`
 - **Получить все пожертвования (для суперпользователя)**: `GET /donation/`
+
+### Работа с отчетами (Google Sheets API)
+
+_Эти эндпоинты доступны только для суперпользователей._
+
+- **Создать отчет**: `POST /report/`  
+  Создает таблицу в Google Sheets с отчетом по закрытым благотворительным проектам.  
+  В ответе возвращается полный URL созданной таблицы, полученный от Google API.
+- **Получить список отчетов**: `GET /report/`  
+  Получить список ранее сформированных отчетов.
+- **Удалить все отчеты**: `DELETE /report/`  
+  Удаляет все отчеты с диска (Google Drive).
+
+
+---
+
+### Объяснение логики работы с Google API
+
+При создании отчета используется функция `spreadsheets_create`, которая отправляет запрос к Google Sheets API. В ответе API возвращаются как идентификатор таблицы, так и её полный URL (ключ `'spreadsheetUrl'`). Этот URL передается в ответе эндпоинта, что исключает необходимость формирования ссылки вручную.  
+Также применяется функция `set_user_permissions` для выдачи прав доступа к таблице, а функция `spreadsheets_update_value` отвечает за заполнение таблицы данными. Все операции выполняются через официальный клиент Google API (Aiogoogle), что гарантирует корректность и актуальность ссылок и данных.
 
 ---
 
