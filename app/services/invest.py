@@ -7,15 +7,16 @@ def invest(
     target: InvestmentBase,
     sources: list[InvestmentBase]
 ) -> list[InvestmentBase]:
-    '''Процесс инвестирования без асинхронных операций и работы с сессией.'''
+    """Процесс инвестирования без асинхронных операций и работы с сессией."""
     updated = []
     close_date = datetime.now()
     for source in sources:
-        source_remaining = source.full_amount - source.invested_amount
-        if source_remaining <= 0:
+        if source.full_amount - source.invested_amount <= 0:
             continue
-        target_remaining = target.full_amount - target.invested_amount
-        transfer = min(target_remaining, source_remaining)
+        transfer = min(
+            target.full_amount - target.invested_amount,
+            source.full_amount - source.invested_amount
+        )
         for obj in (source, target):
             obj.invested_amount += transfer
             if obj.invested_amount >= obj.full_amount:

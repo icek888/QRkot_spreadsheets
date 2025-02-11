@@ -7,12 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import Base
 from app.models import User
 
-ModelType = TypeVar('ModelType', bound=Base)
-CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
+ModelType = TypeVar("ModelType", bound=Base)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType]):
-    '''Базовый класс для выполнения операций CRUD.'''
+    """
+    Базовый класс для выполнения операций CRUD.
+    """
 
     def __init__(self, model: Type[ModelType]):
         self.model = model
@@ -22,7 +24,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         obj_id: int,
         session: AsyncSession,
     ) -> Optional[ModelType]:
-        '''Получить объект модели по id.'''
+        """
+        Получить объект модели по id.
+        """
         result = await session.execute(
             select(self.model).where(self.model.id == obj_id)
         )
@@ -32,7 +36,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         self,
         session: AsyncSession,
     ) -> List[ModelType]:
-        '''Получить список объектов модели.'''
+        """
+        Получить список объектов модели.
+        """
         result = await session.execute(select(self.model))
         return result.scalars().all()
 
@@ -43,10 +49,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         user: Optional[User] = None,
         commit: bool = True,
     ) -> ModelType:
-        '''Создать объект модели и записать в БД.'''
+        """
+        Создать объект модели и записать в БД.
+        """
         new_obj_data = data.dict()
         if user is not None:
-            new_obj_data['user_id'] = user.id
+            new_obj_data["user_id"] = user.id
         new_obj = self.model(**new_obj_data)
         session.add(new_obj)
         if commit:
@@ -58,7 +66,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         self,
         session: AsyncSession,
     ) -> List[ModelType]:
-        '''Получить список активных объектов модели.'''
+        """
+        Получить список активных объектов модели.
+        """
         result = await session.execute(
             select(self.model)
             .where(self.model.fully_invested == false())
@@ -73,8 +83,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         session: AsyncSession,
         commit: bool = True,
     ) -> ModelType:
-        '''Обновить объект модели.'''
-        if hasattr(data, 'dict'):
+        """
+        Обновить объект модели.
+        """
+        if hasattr(data, "dict"):
             update_data = data.dict(exclude_unset=True)
         else:
             update_data = data
@@ -93,7 +105,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType]):
         session: AsyncSession,
         commit: bool = True,
     ) -> ModelType:
-        '''Удалить объект модели.'''
+        """
+        Удалить объект модели.
+        """
         await session.delete(db_obj)
         if commit:
             await session.commit()
