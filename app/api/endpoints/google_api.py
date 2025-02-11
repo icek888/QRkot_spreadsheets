@@ -1,6 +1,8 @@
 from aiogoogle import Aiogoogle
+from aiohttp import ClientResponseError
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+
 
 from app.core.config import settings
 from app.core.db import get_async_session
@@ -43,10 +45,10 @@ async def get_project_progress_report(
             projects,
             wrapper_service
         )
-    except Exception as exc:
+    except ClientResponseError as exc:
         raise HTTPException(
             status_code=500,
-            detail=f'Failed to update spreadsheet: {exc}'
+            detail=f'Failed to create spreadsheet: {exc}'
         ) from exc
     return {'google_sheet_url': spreadsheet_url}
 

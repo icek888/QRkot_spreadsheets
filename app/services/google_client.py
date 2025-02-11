@@ -46,12 +46,7 @@ def get_table_header() -> List[List[str]]:
     """Возвращает шапку таблицы с подставленной датой."""
     current_date = datetime.now().strftime(DATETIME_FORMAT)
     header_copy = copy.deepcopy(TABLE_HEADER_TEMPLATE)
-    for i, row in enumerate(header_copy):
-        header_copy[i] = [
-            (cell.format(report_date=current_date)
-             if '{report_date}' in cell else cell)
-            for cell in row
-        ]
+    header_copy[0][1] = current_date
     return header_copy
 
 
@@ -122,9 +117,7 @@ async def spreadsheets_update_value(
     ]
     table_values = header + data_rows
     num_rows = len(table_values)
-    num_cols = max(
-        (len(row) for row in table_values), default=0
-    )
+    num_cols = max(map(len, table_values))
     if num_rows > DEFAULT_ROW_COUNT or num_cols > DEFAULT_COLUMN_COUNT:
         raise ValueError(
             f'Данные отчёта превышают размеры листа: {num_rows} строк '
@@ -167,7 +160,8 @@ async def delete_spreadsheets_from_disk(
         'drive', settings.google_drive_api_version
     )
     spreadsheets = await get_spreadsheets_from_disk(
-        settings.report_title, wrapper_service
+        settings.report_title,
+        wrapper_service
     )
     for spreadsheet in spreadsheets:
         await wrapper_service.as_service_account(
