@@ -51,6 +51,8 @@ async def get_project_progress_report(
             detail="Данную операцию может выполнить только администратор"
         ) from exc
 
+    return {'google_sheet_url': spreadsheet_url}
+
 
 @router.get('/', dependencies=[Depends(current_superuser)])
 async def get_all_reports(
