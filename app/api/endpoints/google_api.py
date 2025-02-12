@@ -1,8 +1,6 @@
 from aiogoogle import Aiogoogle
-from aiohttp import ClientResponseError
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 from app.core.config import settings
 from app.core.db import get_async_session
@@ -24,6 +22,7 @@ router = APIRouter()
 async def get_project_progress_report(
     session: AsyncSession = Depends(get_async_session),
     wrapper_service: Aiogoogle = Depends(get_service),
+    current_user=Depends(current_superuser),
 ) -> dict[str, str]:
     """
     Создание гугл-таблицы с отчетом по закрытым благотворительным проектам,
@@ -45,10 +44,15 @@ async def get_project_progress_report(
             projects,
             wrapper_service
         )
-    except ClientResponseError as exc:
+    except Exception as exc:
+        if not getattr(current_user, "is_superuser", False):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Данную операцию может выполнить только администратор"
+            ) from exc
         raise HTTPException(
-            status_code=500,
-            detail=f'Failed to create spreadsheet: {exc}'
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Ошибка создания таблицы: {exc}"
         ) from exc
     return {'google_sheet_url': spreadsheet_url}
 
