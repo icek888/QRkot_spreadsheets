@@ -50,7 +50,6 @@ async def get_project_progress_report(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Данную операцию может выполнить только администратор"
         ) from exc
-
     return {'google_sheet_url': spreadsheet_url}
 
 
